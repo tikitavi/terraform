@@ -45,3 +45,23 @@ resource "aws_route_table_association" "route_table_association" {
     subnet_id      = "${aws_subnet.subnet.id}"
     route_table_id = "${aws_route_table.route_table.id}"
 }
+
+resource "aws_security_group" "default" {
+  vpc_id      = "${aws_vpc.vpc.id}"
+  name        = "default-${var.deployment_name}"
+  vpc_id      = "${aws_vpc.vpc.id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.sgroup_inbound_cidr_blocks}"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+}

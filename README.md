@@ -1,5 +1,7 @@
 # terraform
 
-Modify the tf template if you need and run with command `terraform plan -var AWS_AZ=[az]`
+Modify the tf template if you need and run with command `terraform plan`
 
-Then apply with ` terraform apply -var AWS_AZ=[az]`
+Then apply with ` terraform apply`
+
+Don't forget to store your AWS credentials in `.aws/credentials` or configure them by `aws configure`.

@@ -1,41 +1,47 @@
-resource "aws_vpc" "terraform_vpc" {
-    cidr_block           = "10.10.0.0/16"
-    enable_dns_support   = "true"
-    enable_dns_hostnames = "true"
+provider "aws" {
+    region = "${var.aws_region}"
+}
+
+resource "aws_vpc" "vpc" {
+    cidr_block           = "${var.vpc_cidr_block}"
+    enable_dns_support   = "${var.vpc_enable_dns}"
+    enable_dns_hostnames = "${var.vpc_enable_dns_hostnames}"
     tags {
-        Name = "terraform_vpc"
+        Name = "${var.deployment_name}_vpc"
     }
 }
 
-resource "aws_subnet" "terraform_subnet" {
-    cidr_block              = "10.10.0.0/20"
-    vpc_id                  = "${aws_vpc.terraform_vpc.id}"
-    map_public_ip_on_launch = "true"
-    availability_zone       = "${var.AWS_AZ}"
+data "aws_availability_zones" "available" {}
+
+resource "aws_subnet" "subnet" {
+    cidr_block              = "${var.subnet_cidr_block}"
+    vpc_id                  = "${aws_vpc.vpc.id}"
+    map_public_ip_on_launch = "${var.subnet_map_public_ip}"
+    availability_zone       = "${data.aws_availability_zones.available.names[0]}"
     tags {
-        Name = "terraform_subnet"
+        Name = "${var.deployment_name}_subnet"
     }
 }
 
-resource "aws_internet_gateway" "terraform_internet_gateway" {
-    vpc_id = "${aws_vpc.terraform_vpc.id}"
+resource "aws_internet_gateway" "internet_gateway" {
+    vpc_id = "${aws_vpc.vpc.id}"
     tags {
-        Name = "terraform_internet_gateway"
+        Name = "${var.deployment_name}_internet_gateway"
     }
 }
 
-resource "aws_route_table" "terraform_route_table" {
-    vpc_id = "${aws_vpc.terraform_vpc.id}"
+resource "aws_route_table" "route_table" {
+    vpc_id = "${aws_vpc.vpc.id}"
     route {
         cidr_block = "0.0.0.0/0"
-        gateway_id = "${aws_internet_gateway.terraform_internet_gateway.id}"
+        gateway_id = "${aws_internet_gateway.internet_gateway.id}"
     }
     tags {
-        Name = "terraform_route_table"
+        Name = "${var.deployment_name}_route_table"
     }
 }
 
-resource "aws_route_table_association" "terraform_route_table_association" {
-    subnet_id      = "${aws_subnet.terraform_subnet.id}"
-    route_table_id = "${aws_route_table.terraform_route_table.id}"
+resource "aws_route_table_association" "route_table_association" {
+    subnet_id      = "${aws_subnet.subnet.id}"
+    route_table_id = "${aws_route_table.route_table.id}"
 }

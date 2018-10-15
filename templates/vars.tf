@@ -5,6 +5,7 @@ variable "aws_region" {
 
 variable "deployment_name" {
     description = "The name of deployment. Will be the part of resources names."
+    default = "auto"
 }
 
 variable "vpc_cidr_block" {
